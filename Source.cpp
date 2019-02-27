@@ -31,6 +31,10 @@ bool firstMouse = true;
 float deltaTime = 0.0f; // time between current frame and last frame
 float lastFrame = 0.0f;
 
+//Rotations
+GLfloat angleCube =0.0f;
+int refreshMills = 15;
+
 int main()
 {
 	// glfw: initialize and configure
@@ -122,17 +126,98 @@ int main()
 		-0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
 		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
 	// world space positions of our cubes
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(2.0f, 5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f, 3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f, 2.0f, -2.5f),
-		glm::vec3(1.5f, 0.2f, -1.5f),
-		glm::vec3(-1.3f, 1.0f, -1.5f)};
+	glm::vec3 cubePositions[386];
+	
+	int counter = 0;
+	for (int x = 0; x < 10; x++)
+	{
+		for(int z = 0; z < 10; z++)
+		{
+			cubePositions[counter] = glm::vec3(0.0f + x, 0.0f, 0.0f-z);
+			counter++;
+		}
+		
+	}
+
+	for (int x = 0; x < 9; x++)
+	{
+		for (int z = 0; z < 9; z++)
+		{
+			cubePositions[counter] = glm::vec3(0.5f + x, 1.0f, -0.5f - z);
+			counter++;
+		}
+
+	}
+
+	for (int x = 0; x < 8; x++)
+	{
+		for (int z = 0; z < 8; z++)
+		{
+			cubePositions[counter] = glm::vec3(1.0f + x, 2.0f, -1.0f - z);
+			counter++;
+		}
+
+	}
+
+	for (int x = 0; x < 7; x++)
+	{
+		for (int z = 0; z < 7; z++)
+		{
+			cubePositions[counter] = glm::vec3(1.5f + x, 3.0f, -1.5f - z);
+			counter++;
+		}
+
+	}
+
+	for (int x = 0; x < 6; x++)
+	{
+		for (int z = 0; z < 6; z++)
+		{
+			cubePositions[counter] = glm::vec3(2.0f + x, 4.0f, -2.0f - z);
+			counter++;
+		}
+
+	}
+
+	for (int x = 0; x < 5; x++)
+	{
+		for (int z = 0; z < 5; z++)
+		{
+			cubePositions[counter] = glm::vec3(2.5f + x, 5.0f, -2.5f - z);
+			counter++;
+		}
+
+	}
+
+	for (int x = 0; x < 4; x++)
+	{
+		for (int z = 0; z < 4; z++)
+		{
+			cubePositions[counter] = glm::vec3(3.0f + x, 6.0f, -3.0f - z);
+			counter++;
+		}
+
+	}
+
+	for (int x = 0; x < 3; x++)
+	{
+		for (int z = 0; z < 3; z++)
+		{
+			cubePositions[counter] = glm::vec3(3.5f + x, 7.0f, -3.5f - z);
+			counter++;
+		}
+	}
+
+	for (int x = 0; x < 2; x++)
+	{
+		for (int z = 0; z < 2; z++)
+		{
+			cubePositions[counter] = glm::vec3(4.0f + x, 8.0f, -4.0f - z);
+			counter++;
+		}
+	}
+	cubePositions[385] = glm::vec3(4.5f, 9.0f, -4.5f);
+
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -204,7 +289,7 @@ int main()
 	// -------------------------------------------------------------------------------------------
 	ourShader.use();
 	ourShader.setInt("texture1", 0);
-	ourShader.setInt("texture2", 1);
+	// ourShader.setInt("texture2", 1);
 
 	// render loop
 	// -----------
@@ -245,152 +330,16 @@ int main()
 		// render boxes
 		glBindVertexArray(VAO);
 
-		for (unsigned int i = 0; i < 385; i++)
+		for (unsigned int i = 0; i < 386; i++)
 		{
-			if(i < 100)
-			{
-				for(int x = 0;x<10;x++)
-				{
-					for(int z=0;z<10;z++)
-					{
-						glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-						model = glm::translate(model, glm::vec3(x, 0.0f, -z));
+			// calculate the model matrix for each object and pass it to shader before drawing
+			glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+			model = glm::translate(model, cubePositions[i]);
+			// float angle = 20.0f * i;
+			// model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			ourShader.setMat4("model", model);
 
-						ourShader.setMat4("model", model);
-
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-				}
-
-			}
-
-			if (i < 181)
-			{
-				for (int x = 0; x < 9; x++)
-				{
-					for (int z = 0; z < 9; z++)
-					{
-						glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-						model = glm::translate(model, glm::vec3(0.5f+x, 1.0f, -0.5f-z));
-
-						ourShader.setMat4("model", model);
-
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-				}
-			}
-
-			if (i < 245)
-			{
-				for (int x = 0; x < 8; x++)
-				{
-					for (int z = 0; z < 8; z++)
-					{
-						glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-						model = glm::translate(model, glm::vec3(1.0f + x, 2.0f, -1.0f - z));
-
-						ourShader.setMat4("model", model);
-
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-				}
-			}
-
-			if (i < 294)
-			{
-				for (int x = 0; x < 7; x++)
-				{
-					for (int z = 0; z < 7; z++)
-					{
-						glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-						model = glm::translate(model, glm::vec3(1.5f+x, 3.0f, -1.5f+-z));
-
-						ourShader.setMat4("model", model);
-
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-				}
-			}
-
-			if (i < 330)
-			{
-				for (int x = 0; x < 6; x++)
-				{
-					for (int z = 0; z < 6; z++)
-					{
-						glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-						model = glm::translate(model, glm::vec3(2.0f + x, 4.0f, -2.0f + -z));
-
-						ourShader.setMat4("model", model);
-
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-				}
-			}
-
-			if (i < 355)
-			{
-				for (int x = 0; x < 5; x++)
-				{
-					for (int z = 0; z < 5; z++)
-					{
-						glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-						model = glm::translate(model, glm::vec3(2.5f + x, 5.0f, -2.5f + -z));
-
-						ourShader.setMat4("model", model);
-
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-				}
-			}
-
-			if (i < 371)
-			{
-				for (int x = 0; x < 4; x++)
-				{
-					for (int z = 0; z < 4; z++)
-					{
-						glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-						model = glm::translate(model, glm::vec3(3.0f + x, 6.0f, -3.0f + -z));
-
-						ourShader.setMat4("model", model);
-
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-				}
-			}
-
-			if (i < 380)
-			{
-				for (int x = 0; x < 3; x++)
-				{
-					for (int z = 0; z < 3; z++)
-					{
-						glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-						model = glm::translate(model, glm::vec3(3.5f + x, 7.0f, -3.5f + -z));
-
-						ourShader.setMat4("model", model);
-
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-				}
-			}
-
-			if (i < 384)
-			{
-				for (int x = 0; x < 2; x++)
-				{
-					for (int z = 0; z < 2; z++)
-					{
-						glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-						model = glm::translate(model, glm::vec3(4.0f + x, 8.0f, -4.0f + -z));
-
-						ourShader.setMat4("model", model);
-
-						glDrawArrays(GL_TRIANGLES, 0, 36);
-					}
-				}
-			}
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
